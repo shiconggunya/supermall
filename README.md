@@ -69,3 +69,25 @@
 
 
 # 9.选项卡组件
+
+> 1.动态绑定active
+>
+> 设置一个变量currentIndex,用于表示活跃的状态
+>
+> :class="{active: index === currentIndex}
+>
+> 创建单击响应函数
+>
+>  itemClick(index){
+>
+>    *this*.currentIndex = index;
+>
+>   }
+>
+> 2. position: *sticky*;属性css
+
+
+
+# 10.首页开发-保存商品的数据结构
+
+![image-20210406025413016](https://www.shiconggun.cn/wz/img/image-20210406025413016.png)

@@ -132,14 +132,20 @@ import NavBar from 'components/common/navbar/NavBar';
 import tabControl from 'components/content/tabControl/tabControl'
 
 //home组件网络封装
-import {getHomeMultidata} from 'network/home';
+import {getHomeMultidata,getHomeGoods} from 'network/home';
 
 export default {
   name:'Home',
   data(){
     return {
-      banners:[],
-      recommends:[],
+      banners:[], //保存轮播图的数据
+      recommends:[], //保存推荐展示的数据
+      //保存商品的数据
+      goods:{
+        pop:{page:0, list:[]}, //保存流行的数据
+        new:{page:0, list:[]},//保存新款的数据
+        sell:{page:0, list:[]},//保存精选的数据
+      }
     }
   },
   components:{
@@ -153,13 +159,31 @@ export default {
   //组件挂载完执行
   created(){
     //组件创建完之后发送网络请求
-    //1.请求数据
-    getHomeMultidata().then(res =>{
+    //请求多个数据
+    this.getHomeMultidata(); //由于名字一样,this不要忘记
+
+    //请求商品数据
+    this.getHomeGoods('pop');
+    this.getHomeGoods('new');
+    this.getHomeGoods('sell');
+    
+  },
+  methods:{
+    getHomeMultidata(){
+      getHomeMultidata().then(res =>{
       //拿到返回的数据
       this.banners = res.data.banner.list //将数据保存到data
       this.recommends = res.data.recommend.list
     })
-    
+    },
+    getHomeGoods(type){
+      const page = this.goods[type].page +1  //取出原来的page+1
+      getHomeGoods(type,page).then(res =>{
+      this.goods[type].list.push(...res.data.list); //因为有页数,不能直接覆盖,要用push
+      this.goods[type].page++;
+    })
+    }
+
   }
 }
 </script>
