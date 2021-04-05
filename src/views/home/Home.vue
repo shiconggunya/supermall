@@ -8,19 +8,131 @@
     <home-swiper :banners='banners'></home-swiper>
     <!-- 推荐展示组件 -->
     <recommend-view :recommends='recommends'></recommend-view>
+    <!-- 本周推荐组件 -->
+    <feature-view></feature-view>
+    <!-- 选项卡组件 -->
+    <tab-control :titles="['流行','新款','精选']" class="tab-control"></tab-control>
+    <ul>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+      <li>列表</li>
+    </ul>
   </div>
 </template>
 
 <script>
-//顶部导航条
-import NavBar from 'components/common/navbar/NavBar';
-//home组件网络封装
-import {getHomeMultidata} from 'network/home';
 //轮播图组件
 import HomeSwiper from './childComps/HomeSwiper'
 //推荐展示组件
 import RecommendView from './childComps/RecommendView'
+//本周推荐
+import FeatureView from './childComps/FeatureView'
 
+
+//顶部导航条
+import NavBar from 'components/common/navbar/NavBar';
+//选项卡组件
+import tabControl from 'components/content/tabControl/tabControl'
+
+//home组件网络封装
+import {getHomeMultidata} from 'network/home';
 
 export default {
   name:'Home',
@@ -34,8 +146,11 @@ export default {
     NavBar, //顶部导航条组件
     HomeSwiper,//完成好的轮播图组件
     RecommendView, //推荐展示组件
+    FeatureView,  //本周热门组件
+    tabControl,   //选项卡组件
 
   },
+  //组件挂载完执行
   created(){
     //组件创建完之后发送网络请求
     //1.请求数据
@@ -50,8 +165,20 @@ export default {
 </script>
 
 <style>
+  #home{
+    padding-top: 44px;
+  }
   .home-nav{
     background-color:var(--color-tint) ;
     color: white;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 9;
+  }
+  .tab-control{
+    position: sticky;
+    top: 44px;
   }
 </style>
