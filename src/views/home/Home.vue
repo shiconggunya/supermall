@@ -12,6 +12,9 @@
     <feature-view></feature-view>
     <!-- 选项卡组件 -->
     <tab-control :titles="['流行','新款','精选']" class="tab-control"></tab-control>
+    <!--商品展示列表组件  -->
+    <goods-list :goods='goods.pop.list'></goods-list>
+
     <ul>
       <li>列表</li>
       <li>列表</li>
@@ -130,6 +133,8 @@ import FeatureView from './childComps/FeatureView'
 import NavBar from 'components/common/navbar/NavBar';
 //选项卡组件
 import tabControl from 'components/content/tabControl/tabControl'
+//商品列表组件
+import GoodsList from '../../components/content/goods/GoodsList'
 
 //home组件网络封装
 import {getHomeMultidata,getHomeGoods} from 'network/home';
@@ -153,7 +158,8 @@ export default {
     HomeSwiper,//完成好的轮播图组件
     RecommendView, //推荐展示组件
     FeatureView,  //本周热门组件
-    tabControl,   //选项卡组件
+    tabControl,  //选项卡组件
+    GoodsList,  //商品列表组件 
 
   },
   //组件挂载完执行
@@ -169,7 +175,7 @@ export default {
     
   },
   methods:{
-    getHomeMultidata(){
+      getHomeMultidata(){
       getHomeMultidata().then(res =>{
       //拿到返回的数据
       this.banners = res.data.banner.list //将数据保存到data
@@ -204,5 +210,6 @@ export default {
   .tab-control{
     position: sticky;
     top: 44px;
+    z-index: 9;
   }
 </style>

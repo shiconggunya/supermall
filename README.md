@@ -91,3 +91,38 @@
 # 10.首页开发-保存商品的数据结构
 
 ![image-20210406025413016](https://www.shiconggun.cn/wz/img/image-20210406025413016.png)
+
+# 11.首页开发-请求网络数据
+
+```javascript
+  data(){
+    return {
+      banners:[], //保存轮播图的数据
+      recommends:[], //保存推荐展示的数据
+      //保存商品的数据
+      goods:{
+        pop:{page:0, list:[]}, //保存流行的数据
+        new:{page:0, list:[]},//保存新款的数据
+        sell:{page:0, list:[]},//保存精选的数据
+      }
+    }
+  },
+  //将网络请求的代码都封装到了methods里
+  //创建实例的时候,调用方法请求
+   methods:{
+      getHomeMultidata(){
+      getHomeMultidata().then(res =>{
+      //拿到返回的数据
+      this.banners = res.data.banner.list //将数据保存到data
+      this.recommends = res.data.recommend.list
+    })
+    },
+    getHomeGoods(type){
+      const page = this.goods[type].page +1  //取出原来的page+1
+      getHomeGoods(type,page).then(res =>{
+      this.goods[type].list.push(...res.data.list); //因为有页数,不能直接覆盖,要用push
+      this.goods[type].page++;
+    })
+    }
+```
+
