@@ -4,9 +4,17 @@
     <nav-bar class="home-nav">
       <div slot="center">购物街</div>
     </nav-bar>
-    <scroll class="content">
+    <!-- 封装好的滚动框架 -->`
+    <scroll
+      class="content"
+      ref="scroll"
+      :probeType="3" 
+      :pullUpLoad="true"
+      @scroll="contentScroll"
+      @pullingUp = 'loadMore'
+    >
       <!-- 轮播图组件 -->
-      <home-swiper :banners="banners" ref="aaa"></home-swiper>
+      <home-swiper :banners="banners" ></home-swiper>
       <!-- 推荐展示组件 -->
       <recommend-view :recommends="recommends"></recommend-view>
       <!-- 本周推荐组件 -->
@@ -20,6 +28,8 @@
       <!--商品展示列表组件  -->
       <goods-list :goods="showGoods"></goods-list>
     </scroll>
+    <!-- 返回顶部的组件 -->
+    <back-top @click.native="backClick" v-show="isShowBackTop"></back-top>
   </div>
 </template>
 
@@ -37,12 +47,13 @@ import NavBar from "components/common/navbar/NavBar";
 import tabControl from "components/content/tabControl/tabControl";
 //商品列表组件
 import GoodsList from "components/content/goods/GoodsList";
+//返回顶部按钮组件
+import BackTop from "components/content/backTop/BackTop.vue";
 
 //home组件网络封装
 import { getHomeMultidata, getHomeGoods } from "network/home";
-
 //引入滚动优化框架的封装
-import Scroll from "../../components/scroll/Scroll.vue";
+import Scroll from "components/scroll/Scroll.vue";
 
 export default {
   name: "Home",
@@ -57,6 +68,7 @@ export default {
         sell: { page: 0, list: [] }, //保存精选的数据
       },
       currentType: "pop", //要展示的类型
+      isShowBackTop: false, //决定时候显示返回顶部按钮
     };
   },
   components: {
@@ -66,7 +78,8 @@ export default {
     FeatureView, //本周热门组件
     tabControl, //选项卡组件
     GoodsList, //商品列表组件
-    Scroll,
+    Scroll, //封装好的滚动组件
+    BackTop, //返回顶部的组件
   },
   //组件创建完执行
   created() {
@@ -105,6 +118,23 @@ export default {
       }
     },
 
+    //2.返回顶部按钮的监听
+    backClick() {
+      //通过ref拿到scroll组件对象,这个组件对象里的data有scroll
+      this.$refs.scroll.scrollTo(0, 0, 500);
+    },
+
+    //3.获取滚动位置的方法
+    contentScroll(position) {
+      //注意position的y是负数
+      this.isShowBackTop = -position.y > 1000;
+    },
+
+    //4.下拉加载更多
+    loadMore(){
+      this.getHomeGoods(this.currentType);
+    },
+
     /*
       网络请求相关的方法
     */
@@ -122,6 +152,7 @@ export default {
       getHomeGoods(type, page).then((res) => {
         this.goods[type].list.push(...res.data.list); //因为有页数,不能直接覆盖,要用push
         this.goods[type].page++;
+        this.$refs.scroll.finishPullUp();
       });
     },
   },
@@ -149,16 +180,16 @@ export default {
   z-index: 9;
 }
 .tab-control {
-  position: sticky;
+  /* position: sticky;
   top: 44px;
-  z-index: 9;
+  z-index: 9; */
 }
 /* .content{
   margin-top: 44px;
   height: calc(100% - 93px);
 } */
 
-.content{
+.content {
   position: absolute;
   top: 44px;
   bottom: 49px;
