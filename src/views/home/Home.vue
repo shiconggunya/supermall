@@ -4,123 +4,22 @@
     <nav-bar class="home-nav">
       <div slot="center">购物街</div>
     </nav-bar>
-    <!-- 轮播图组件 -->
-    <home-swiper :banners="banners"></home-swiper>
-    <!-- 推荐展示组件 -->
-    <recommend-view :recommends="recommends"></recommend-view>
-    <!-- 本周推荐组件 -->
-    <feature-view></feature-view>
-    <!-- 选项卡组件 -->
-    <tab-control
-      :titles="['流行', '新款', '精选']"
-      class="tab-control"
-      @tabClick="tabClick"
-    ></tab-control>
-    <!--商品展示列表组件  -->
-    <goods-list :goods="showGoods"></goods-list>
-
-    <ul>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-      <li>列表</li>
-    </ul>
+    <scroll class="content">
+      <!-- 轮播图组件 -->
+      <home-swiper :banners="banners" ref="aaa"></home-swiper>
+      <!-- 推荐展示组件 -->
+      <recommend-view :recommends="recommends"></recommend-view>
+      <!-- 本周推荐组件 -->
+      <feature-view></feature-view>
+      <!-- 选项卡组件 -->
+      <tab-control
+        :titles="['流行', '新款', '精选']"
+        class="tab-control"
+        @tabClick="tabClick"
+      ></tab-control>
+      <!--商品展示列表组件  -->
+      <goods-list :goods="showGoods"></goods-list>
+    </scroll>
   </div>
 </template>
 
@@ -141,6 +40,9 @@ import GoodsList from "components/content/goods/GoodsList";
 
 //home组件网络封装
 import { getHomeMultidata, getHomeGoods } from "network/home";
+
+//引入滚动优化框架的封装
+import Scroll from "../../components/scroll/Scroll.vue";
 
 export default {
   name: "Home",
@@ -164,8 +66,9 @@ export default {
     FeatureView, //本周热门组件
     tabControl, //选项卡组件
     GoodsList, //商品列表组件
+    Scroll,
   },
-  //组件挂载完执行
+  //组件创建完执行
   created() {
     //组件创建完之后发送网络请求
     //请求多个数据
@@ -175,8 +78,9 @@ export default {
     this.getHomeGoods("pop");
     this.getHomeGoods("new");
     this.getHomeGoods("sell");
-
   },
+  //组件挂载完执行
+  mounted() {},
   methods: {
     /*
       事件监听的方法
@@ -221,17 +125,19 @@ export default {
       });
     },
   },
-  computed:{
-    showGoods(){
-      return this.goods[this.currentType].list
-    }
-  }
+  computed: {
+    showGoods() {
+      return this.goods[this.currentType].list;
+    },
+  },
 };
 </script>
 
-<style>
+<style scoped >
 #home {
   padding-top: 44px;
+  height: 100vh;
+  position: relative;
 }
 .home-nav {
   background-color: var(--color-tint);
@@ -246,5 +152,15 @@ export default {
   position: sticky;
   top: 44px;
   z-index: 9;
+}
+/* .content{
+  margin-top: 44px;
+  height: calc(100% - 93px);
+} */
+
+.content{
+  position: absolute;
+  top: 44px;
+  bottom: 49px;
 }
 </style>
