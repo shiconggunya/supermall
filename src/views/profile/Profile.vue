@@ -1,16 +1,125 @@
 <template>
   <div>
     <h2>我的</h2>
+    <scroll class="content" :probeType='3' >
+      <ul>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+        <li>哈哈哈</li>
+      </ul>
+    </scroll>
   </div>
 </template>
 
 <script>
+import Scroll from 'components/scroll/Scroll'
 export default {
   name:'Profile',
-  
+  components: { Scroll },
 }
 </script>
 
-<style>
-
+<style scoped>
+  .content{
+    height: 300px;
+    background-color: tomato;
+   overflow: hidden;
+  }
 </style>
