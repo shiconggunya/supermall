@@ -417,4 +417,238 @@ export default {
 
 ## 5.12 下拉加载更多
 
-> 1.使用props,动态
+> 1.使用props,动态开启下拉加载更多
+>
+> ```vue
+>       pullUpLoad:this.pullUpLoad, //下拉加载更多
+>       
+>     `pullUpLoad:{
+>       typeof: Boolean,
+>       default(){
+>         return false;
+>       }
+>     }
+> ```
+>
+> 2.在监听到下拉加载更多时发送事件,告诉外部已经下拉加载更多
+>
+> ```javascript
+>     //3.监听下拉加载更多事件
+>     this.scroll.on('pullingUp',() => {
+>      this.$emit('pullingUp') //发射事件告诉别人可以加载更多
+>     })
+> 
+> ```
+>
+> 3.外部接收到事件,开始发送网络请求,请求下一页数据
+>
+> ```javascript
+>     //4.下拉加载更多
+>     loadMore(){
+>       this.getHomeGoods(this.currentType);
+>     },
+> ```
+>
+> 4.注意请求完的时候记得完成这一次下拉动作,
+>
+> ```javascript
+>   //2.获取商品数据的方法
+>     getHomeGoods(type) {
+>         this.$refs.scroll.finishPullUp();
+>       });
+>     },
+> ```
+>
+> 
+
+
+
+
+
+## 5.13 解决better-score的滚动bug
+
+* Better-Scroll在决定有多少区域可以滚动时, 是根据scrollerHeight属性决定
+  * scrollerHeight属性是根据放Better-Scroll的content中的子组件的高度
+  * 但是我们的首页中, 刚开始在计算scrollerHeight属性时, 是没有将图片计算在内的
+  * 所以, 计算出来的告诉是错误的(1300+)
+  * 后来图片加载进来之后有了新的高度, 但是scrollerHeight属性并没有进行更新.
+  * 所以滚动出现了问题
+* 如何解决这个问题了?
+  * 监听每一张图片是否加载完成, 只要有一张图片加载完成了, 执行一次refresh()
+  * 如何监听图片加载完成了?
+    * 原生的js监听图片: img.onload = function() {}
+    * Vue中监听: @load='方法'
+  * 调用scroll的refresh()
+* 如何将GoodsListItem.vue中的事件传入到Home.vue中
+  * 因为涉及到非父子组件的通信, 所以这里我们选择了**事件总线**
+    * bus ->总线
+    * Vue.prototype.$bus = new Vue()
+    * this.bus.emit('事件名称', 参数)
+    * this.bus.on('事件名称', 回调函数(参数))
+
+
+* 问题一: refresh找不到的问题
+  * 第一: 在Scroll.vue中, 调用this.scroll的方法之前, 判断this.scroll对象是否有值
+  * 第二: 在mounted生命周期函数中使用 this.$refs.scroll而不是created中
+
+
+
+```javascript
+//注意 ref 不要在created()调用
+```
+
+
+
+##  5.14 对于refresh非常频繁的问题, 进行防抖操作
+
+* 防抖debounce/节流throttle(课下研究一下)
+* 防抖函数起作用的过程:
+  * 如果我们直接执行refresh, 那么refresh函数会被执行30次.
+  * 可以将refresh函数传入到debounce函数中, 生成一个新的函数.
+  * 之后在调用非常频繁的时候, 就使用新生成的函数.
+  * 而新生成的函数, 并不会非常频繁的调用, 如果下一次执行来的非常快, 那么会将上一次取消掉
+
+```javascript
+    //封装的防抖函数
+    debounce(func,delay){ //1.传入要防抖的函数  2.延时的时间
+      let timer = null;  //定义一个变量记录定时器
+
+      return function (...args){
+        if(timer) clearTimeout(timer);  //清除上一次定时器
+
+        timer = setTimeout(() => {
+          func.apply(this,args);
+        }, delay);
+      }
+```
+
+
+
+
+
+## 5.15 tabControl的吸顶效果
+
+> 1.必须知道滚动到多少时,开始有吸顶效果
+>
+>  1.1通过ref获取tabControl元素,拿到offsetTop
+>
+>  1.2由于图片加载的原因,直接在mounted(),拿到的offsetTop是不正确的,所以要在轮播图监听图片是否加载完成
+>
+> ```javascript
+>     //监听图片是否加载完成(轮播图组件里)
+>   methods: {
+>     //监听图片是否加载完成
+>     imageLoad() {
+>       if (!this.isLoad) { //如果还没有加载
+>         //加载完成发送事件
+>         this.$emit("swiperImageLoad");
+>         this.isLoad = !this.isLoad;
+>       }
+>     },
+>   },  
+> 
+>     methods: {    //(home组件)
+>      //5.轮播图片加载完成
+>     swiperImageLoad(){
+>     //2.获取tabControl的tabOffsetTop
+>     //所有组件都有一个属性$el,用于获取组件中的元素
+>     this.tabOffsetTop = this.$refs.tabControl.$el.offsetTop;
+>     },
+>   }, 
+> 
+> 	
+> ```
+>
+> 2.拿到位置后判断,是否到达该位置,到达该位置后就用狸猫换太子
+>
+> ```javascript
+>     //3.滚动位置的监听
+>     contentScroll(position) {
+>       //2.判断tabControl是否固定(吸顶)
+>       this.isTabFixed = -position.y > this.tabOffsetTop;
+>     },
+> ```
+>
+> 3.狸猫换太子
+>
+> ​	3.1现在上面复制一个一样的,刚好在顶部导航条下面,默认v-show隐藏,当监听到了吸顶的位置
+>
+> ​		时在显示出来,盖住原来的
+>
+> ```vue
+>     <tab-control
+>       :titles="['流行', '新款', '精选']"
+>       @tabClick="tabClick"
+>       ref="tabControl1"
+>       class="tab-contral"
+>       v-show="isTabFixed"
+>     ></tab-control>
+> ```
+>
+> 3.2狸猫换太子的bug
+>
+>   两个一样的标签栏状态会不统一,要把两个的状态改为一致
+>
+>   1.分别拿到两个状态栏的currentIndex这个标记当前点击的变量
+>
+>  2.将这两个变量改为一致的
+>
+> ```javascript
+>     tabClick(index) {
+>       switch (index) {
+>         case 0:
+>           this.currentType = "pop";
+>           break;
+> 
+>         case 1:
+>           this.currentType = "new";
+>           break;
+> 
+>         case 2:
+>           this.currentType = "sell";
+>           break;
+> 
+>         default:
+>           break;
+>       }
+>       //让两个的点击状态保持一致
+>       this.$refs.tabControl1.currentIndex=index;
+>       this.$refs.tabControl2.currentIndex=index;
+>     },
+> ```
+>
+> 
+
+
+
+## 5.15让Home保持原来的状态
+
+> 1. 让Home不要随意销毁(keep-alive)
+>
+> ```vue
+>   <keep-alive>
+>     <router-view></router-view>
+>   </keep-alive>
+> ```
+>
+> 2.让home中的内容保持原来的位置
+>
+> ​	2.1离开时,保存一个位置信息 ,saveY
+>
+> ​	2.2进来时,将位置设置为原来保存的位置saveY信息即可
+>
+> ```javascript
+>   activated() {
+>     //路由活跃的时候(进来)
+>     //进来时设置保存的高度
+>     this.$refs.scroll.scrollTo(0, this.saveY, 0);
+>     this.$refs.scroll.refresh() //刷新一下
+>   },
+>   deactivated() {
+>     //不活跃的时候(离开)
+>     //离开时保存高度
+>     this.saveY = this.$refs.scroll.getScrollY();
+>   },
+> ```
+>
+> 

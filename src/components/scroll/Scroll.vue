@@ -66,9 +66,12 @@ export default {
 
     //加载完刷新
     refresh() {
-      console.log("-----");
       this.scroll && this.scroll.refresh();
     },
+    //获取滚动条的高度
+    getScrollY(){
+      return this.scroll ? this.scroll.y :0;  //有就返回高度,没有就返回0
+    }
   },
 };
 </script>

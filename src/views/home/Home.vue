@@ -4,17 +4,27 @@
     <nav-bar class="home-nav">
       <div slot="center">购物街</div>
     </nav-bar>
+    <tab-control
+      :titles="['流行', '新款', '精选']"
+      @tabClick="tabClick"
+      ref="tabControl1"
+      class="tab-contral"
+      v-show="isTabFixed"
+    ></tab-control>
     <!-- 封装好的滚动框架 -->`
     <scroll
       class="content"
       ref="scroll"
-      :probeType="3" 
+      :probeType="3"
       :pullUpLoad="true"
       @scroll="contentScroll"
-      @pullingUp = 'loadMore'
+      @pullingUp="loadMore"
     >
       <!-- 轮播图组件 -->
-      <home-swiper :banners="banners" ></home-swiper>
+      <home-swiper
+        :banners="banners"
+        @swiperImageLoad="swiperImageLoad"
+      ></home-swiper>
       <!-- 推荐展示组件 -->
       <recommend-view :recommends="recommends"></recommend-view>
       <!-- 本周推荐组件 -->
@@ -22,8 +32,8 @@
       <!-- 选项卡组件 -->
       <tab-control
         :titles="['流行', '新款', '精选']"
-        class="tab-control"
         @tabClick="tabClick"
+        ref="tabControl2"
       ></tab-control>
       <!--商品展示列表组件  -->
       <goods-list :goods="showGoods"></goods-list>
@@ -55,6 +65,9 @@ import { getHomeMultidata, getHomeGoods } from "network/home";
 //引入滚动优化框架的封装
 import Scroll from "components/scroll/Scroll.vue";
 
+//引入一些工具方法
+import { debounce } from "common/utils";
+
 export default {
   name: "Home",
   data() {
@@ -69,6 +82,9 @@ export default {
       },
       currentType: "pop", //要展示的类型
       isShowBackTop: false, //决定时候显示返回顶部按钮
+      tabOffsetTop: 0, //tabControl距离顶部的高度
+      isTabFixed: false, //决定tabControl是否吸顶
+      saveY: 0, //保存路由离开时位置的高度
     };
   },
   components: {
@@ -93,7 +109,26 @@ export default {
     this.getHomeGoods("sell");
   },
   //组件挂载完执行
-  mounted() {},
+  mounted() {
+    //1.加载防抖
+    const refresh = debounce(this.$refs.scroll.refresh, 500);
+    //监听item图片加载完成(事件总线)
+    this.$bus.$on("itemImageLoad", () => {
+      // this.$refs.scroll.refresh();
+      refresh();
+    });
+  },
+  activated() {
+    //路由活跃的时候(进来)
+    //进来时设置保存的高度
+    this.$refs.scroll.scrollTo(0, this.saveY, 0);
+    this.$refs.scroll.refresh() //刷新一下
+  },
+  deactivated() {
+    //不活跃的时候(离开)
+    //离开时保存高度
+    this.saveY = this.$refs.scroll.getScrollY();
+  },
   methods: {
     /*
       事件监听的方法
@@ -116,6 +151,9 @@ export default {
         default:
           break;
       }
+      //让两个的点击状态保持一致
+      this.$refs.tabControl1.currentIndex = index;
+      this.$refs.tabControl2.currentIndex = index;
     },
 
     //2.返回顶部按钮的监听
@@ -124,17 +162,27 @@ export default {
       this.$refs.scroll.scrollTo(0, 0, 500);
     },
 
-    //3.获取滚动位置的方法
+    //3.滚动位置的监听
     contentScroll(position) {
+      //1.判断backTop是否显示
       //注意position的y是负数
       this.isShowBackTop = -position.y > 1000;
+
+      //2.判断tabControl是否固定(吸顶)
+      this.isTabFixed = -position.y > this.tabOffsetTop;
     },
 
     //4.下拉加载更多
-    loadMore(){
+    loadMore() {
       this.getHomeGoods(this.currentType);
     },
 
+    //5.轮播图片加载完成
+    swiperImageLoad() {
+      //2.获取tabControl的tabOffsetTop
+      //所有组件都有一个属性$el,用于获取组件中的元素
+      this.tabOffsetTop = this.$refs.tabControl2.$el.offsetTop;
+    },
     /*
       网络请求相关的方法
     */
@@ -166,28 +214,31 @@ export default {
 
 <style scoped >
 #home {
-  padding-top: 44px;
+  /* padding-top: 44px; */
   height: 100vh;
   position: relative;
 }
 .home-nav {
   background-color: var(--color-tint);
   color: white;
-  position: fixed;
+  position: relative;
+  z-index: 9;
+  /* 使用浏览器原生滚动时,将导航栏固定住,不跟随滚动 */
+  /* position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  z-index: 9;
-}
-.tab-control {
-  /* position: sticky;
-  top: 44px;
   z-index: 9; */
 }
+
 /* .content{
   margin-top: 44px;
   height: calc(100% - 93px);
 } */
+.tab-contral {
+  position: relative;
+  z-index: 9;
+}
 
 .content {
   position: absolute;

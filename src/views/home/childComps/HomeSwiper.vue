@@ -3,7 +3,7 @@
     <swiper>
       <swiper-item v-for="item in banners" :key="item.image">
         <a :href="item.link">
-          <img :src="item.image" />
+          <img :src="item.image" @load="imageLoad" />
         </a>
       </swiper-item>
     </swiper>
@@ -19,15 +19,29 @@ export default {
     Swiper, //轮播图组件
     SwiperItem, //轮播图的每个元素组件
   },
-  props:{
-    banners:{
-      type:Array,
-      default(){
+  data() {
+    return {
+      isLoad: false,  //图片是否加载完一次了
+    };
+  },
+  props: {
+    banners: {
+      type: Array,
+      default() {
         return [];
+      },
+    },
+  },
+  methods: {
+    //监听图片是否加载完成
+    imageLoad() {
+      if (!this.isLoad) { //如果还没有加载
+        //加载完成发送事件
+        this.$emit("swiperImageLoad");
+        this.isLoad = !this.isLoad;
       }
     },
   },
-  
 };
 </script>
 
