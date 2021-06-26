@@ -36,8 +36,11 @@ export default {
   },
   methods: {
     titleClick(index) {
-      //点击谁,谁就变色
+      //1.点击谁,谁就变色
       this.currentIndex = index;
+
+      //2.发送点击事件
+      this.$emit('titleClick',index);
     },
     backClick(){
       //点击返回

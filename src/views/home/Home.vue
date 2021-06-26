@@ -4,6 +4,8 @@
     <nav-bar class="home-nav">
       <div slot="center">购物街</div>
     </nav-bar>
+
+    <!-- 复制的选项卡组件 -->
     <tab-control
       :titles="['流行', '新款', '精选']"
       @tabClick="tabClick"
@@ -11,6 +13,7 @@
       class="tab-contral"
       v-show="isTabFixed"
     ></tab-control>
+
     <!-- 封装好的滚动框架 -->`
     <scroll
       class="content"
@@ -57,16 +60,15 @@ import NavBar from "components/common/navbar/NavBar";
 import tabControl from "components/content/tabControl/tabControl";
 //商品列表组件
 import GoodsList from "components/content/goods/GoodsList";
-//返回顶部按钮组件
-import BackTop from "components/content/backTop/BackTop.vue";
 
 //home组件网络封装
 import { getHomeMultidata, getHomeGoods } from "network/home";
 //引入滚动优化框架的封装
 import Scroll from "components/scroll/Scroll.vue";
 
-//引入一些工具方法
-import { debounce } from "common/utils";
+
+//引入混入
+import {itemListenerMixin,backTopMixin} from 'common/mixin'
 
 export default {
   name: "Home",
@@ -81,7 +83,6 @@ export default {
         sell: { page: 0, list: [] }, //保存精选的数据
       },
       currentType: "pop", //要展示的类型
-      isShowBackTop: false, //决定时候显示返回顶部按钮
       tabOffsetTop: 0, //tabControl距离顶部的高度
       isTabFixed: false, //决定tabControl是否吸顶
       saveY: 0, //保存路由离开时位置的高度
@@ -95,8 +96,8 @@ export default {
     tabControl, //选项卡组件
     GoodsList, //商品列表组件
     Scroll, //封装好的滚动组件
-    BackTop, //返回顶部的组件
   },
+  mixins:[itemListenerMixin,backTopMixin],
   //组件创建完执行
   created() {
     //组件创建完之后发送网络请求
@@ -110,24 +111,21 @@ export default {
   },
   //组件挂载完执行
   mounted() {
-    //1.加载防抖
-    const refresh = debounce(this.$refs.scroll.refresh, 500);
-    //监听item图片加载完成(事件总线)
-    this.$bus.$on("itemImageLoad", () => {
-      // this.$refs.scroll.refresh();
-      refresh();
-    });
+
   },
   activated() {
     //路由活跃的时候(进来)
-    //进来时设置保存的高度
+    //1.进来时设置保存的高度
     this.$refs.scroll.scrollTo(0, this.saveY, 0);
     this.$refs.scroll.refresh() //刷新一下
   },
   deactivated() {
     //不活跃的时候(离开)
-    //离开时保存高度
+    //1.离开时保存高度
     this.saveY = this.$refs.scroll.getScrollY();
+  
+    //2.取消全局事件监听
+    this.$bus.$off('itemImgLoad',this.itemImgListener);
   },
   methods: {
     /*
@@ -151,22 +149,15 @@ export default {
         default:
           break;
       }
+      if(this.$refs.tabControl1.currentIndex != null){
       //让两个的点击状态保持一致
       this.$refs.tabControl1.currentIndex = index;
       this.$refs.tabControl2.currentIndex = index;
+      }
     },
-
-    //2.返回顶部按钮的监听
-    backClick() {
-      //通过ref拿到scroll组件对象,这个组件对象里的data有scroll
-      this.$refs.scroll.scrollTo(0, 0, 500);
-    },
-
     //3.滚动位置的监听
     contentScroll(position) {
-      //1.判断backTop是否显示
-      //注意position的y是负数
-      this.isShowBackTop = -position.y > 1000;
+       this.listenShowBackTop(position);
 
       //2.判断tabControl是否固定(吸顶)
       this.isTabFixed = -position.y > this.tabOffsetTop;
